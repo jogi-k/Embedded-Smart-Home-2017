@@ -4,18 +4,36 @@ from flask_bootstrap import Bootstrap
 from tiles import SimpleTile, TileManager
 from helper import PageContext
 
+import Adafruit_DHT
+
 app = Flask(__name__)
 Bootstrap(app)
+app.config['BOOTSTRAP_SERVE_LOCAL'] = True
 
 @app.route('/')
 def main():
+
+    # Define sensor channels
+    pin = 5
+    MySensor = Adafruit_DHT.DHT11
+
+    # Read sensor data
+    humidity, temperature = Adafruit_DHT.read_retry(MySensor, pin)
+  
+    # Print out results
+    tempstring =  str(int(temperature)) + "C"
+    humistring  = str(int(humidity)) + "%"
+  
+
+
+
     tiles = [
         SimpleTile("Licht", "#EEEE00", "light/"),
         SimpleTile("Heizung", "#FF0000", "heaters/"),
         SimpleTile("Sicherheit", "#30FF00", "security/"),
         SimpleTile("Wasser", "#0000FF", "water/"),
-        SimpleTile("Extrapunkt 1", "#00FFFF", "/"),
-        SimpleTile("Extrapunkt 2", "#FF00FF", "/"),
+        SimpleTile(tempstring, "#0000FF", "/"),
+        SimpleTile(humistring, "#FF0000", "/"),
         SimpleTile("Extrapunkt 3", "#A0FFA0", "/"),
         SimpleTile("Extrapunkt 4", "#00A0FF", "/"),
     ]
