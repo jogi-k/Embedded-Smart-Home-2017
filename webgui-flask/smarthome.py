@@ -4,26 +4,43 @@ from flask_bootstrap import Bootstrap
 from tiles import SimpleTile, TileManager
 from helper import PageContext
 
-import Adafruit_DHT
+import sqlite3
+from flask import g
+
 
 app = Flask(__name__)
 Bootstrap(app)
 app.config['BOOTSTRAP_SERVE_LOCAL'] = True
 
+DATABASE = "sample_database.sqlite"
+
+
+def get_db():
+    db = getattr(g,'_database',None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE)
+    return db
+
+def query_db(query, args=(), one=False ):
+    cur = get_db().execute(query,args)
+    rv = cur.fetchall()
+    cur.close()
+    return (rv[0] if rv else None) if one else rv
+
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g,'_database',None)
+    if db is not None:
+        db.close()
+
+
+
+
 @app.route('/')
 def main():
-
-    # Define sensor channels
-    pin = 5
-    MySensor = Adafruit_DHT.DHT11
-
-    # Read sensor data
-    humidity, temperature = Adafruit_DHT.read_retry(MySensor, pin)
-  
-    # Print out results
-    tempstring =  str(int(temperature)) + "C"
-    humistring  = str(int(humidity)) + "%"
-  
+    temp = query_db("SELECT wert,einheit FROM sensoren ORDER BY zeit DESC", one=True)
+    print(temp)
 
 
 
@@ -32,8 +49,8 @@ def main():
         SimpleTile("Heizung", "#FF0000", "heaters/"),
         SimpleTile("Sicherheit", "#30FF00", "security/"),
         SimpleTile("Wasser", "#0000FF", "water/"),
-        SimpleTile(tempstring, "#0000FF", "/"),
-        SimpleTile(humistring, "#FF0000", "/"),
+        SimpleTile("Innentemperatur : " + temp[0] + " " + temp[1], "#0000FF", "/"),
+        SimpleTile("Humidity", "#FF0000", "/"),
         SimpleTile("Extrapunkt 3", "#A0FFA0", "/"),
         SimpleTile("Extrapunkt 4", "#00A0FF", "/"),
     ]
