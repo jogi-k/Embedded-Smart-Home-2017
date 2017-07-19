@@ -14,10 +14,10 @@ def main():
         SimpleTile("Heizung", "#FF0000", "heaters/"),
         SimpleTile("Sicherheit", "#30FF00", "security/"),
         SimpleTile("Wasser", "#0000FF", "water/"),
-        SimpleTile("Extrapunkt 1", "#00FFFF", "/"),
-        SimpleTile("Extrapunkt 2", "#FF00FF", "/"),
-        SimpleTile("Extrapunkt 3", "#A0FFA0", "/"),
-        SimpleTile("Extrapunkt 4", "#00A0FF", "/"),
+        SimpleTile("Innentemperatur", "#FF0000", "/"),
+        SimpleTile("Aussentemperatur", "#00FF00", "/"),
+        SimpleTile("Luftfeuchtigkeit", "#0000FF", "/"),
+        SimpleTile("Helligkeit", "#FFFF00", "/"),
     ]
 
     manager = TileManager(tiles)
