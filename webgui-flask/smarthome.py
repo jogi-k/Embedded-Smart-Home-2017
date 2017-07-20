@@ -49,7 +49,7 @@ def main():
         SimpleTile("Heizung", "#FF0000", "heaters/"),
         SimpleTile("Sicherheit", "#30FF00", "security/"),
         SimpleTile("Wasser", "#0000FF", "water/"),
-        SimpleTile("Innentemperatur : " + temp[0] + " " + temp[1], "#0000FF", "/"),
+        SimpleTile("Innentemperatur : " + temp[0] + " " + temp[1], "#0000FF", "tempchart/"),
         SimpleTile("Humidity", "#FF0000", "/"),
         SimpleTile("Extrapunkt 3", "#A0FFA0", "/"),
         SimpleTile("Extrapunkt 4", "#00A0FF", "/"),
@@ -87,6 +87,21 @@ def light():
     manager = TileManager(tiles)
     context = PageContext("Smarthome Projekt", "Licht", [["/", "Home"]])
     return render_template("main.html", tilerows=manager, context=context)
+
+
+@app.route('/tempchart/')
+def tempchart():
+    context = PageContext("Smarthome-Projekt-Temperaturkurve","Temperatur", [["/", "Home"]])
+    temp = query_db("SELECT wert,zeit FROM sensoren WHERE name='temp'")
+    print(temp)
+    tempvalues = []
+    temptimes = []
+
+    for singlevalues in temp:
+        tempvalues.append(singlevalues[0])
+        temptimes.append(singlevalues[1])
+
+    return render_template("linechart.html", values=tempvalues, times= temptimes, context = context)
 
 if __name__ == "__main__":
     app.run(debug=True)
